@@ -282,6 +282,14 @@ function drawAllDotColors() {
   }
 }
 
+function firstNote(x, y) {
+    return Math.max(x, y)
+}
+
+function furtherNotes(x1, y1, x2, y2) {
+    return Math.round(8 * (Math.atan2(x2-x1, y2-y1) + Math.PI))
+}
+
 function animateFibonacciSequence(circuit, delay=0.1) {
   dotColorationTimes[circuit[0][0]][circuit[0][1]] = millis();
   dots.push(
@@ -292,7 +300,7 @@ function animateFibonacciSequence(circuit, delay=0.1) {
     )
   )
   let firstNoteTime = context.currentTime;
-  playNote(currentScale.get(circuit[0][1]), 1.0, firstNoteTime, 0.5);
+  playNote(currentScale.get(firstNote(...circuit[0])), 1.0, firstNoteTime, 0.5);
   for (let i = 1; i < circuit.length; i++) {
     let [x, y] = circuit[i];
     let decayMul = Math.pow(sliderDecay.value(), i);
@@ -315,7 +323,7 @@ function animateFibonacciSequence(circuit, delay=0.1) {
     }]);
     scheduledNotes.push([
       firstNoteTime + i * delay,
-      playNote(currentScale.get(y), 0.7 * Math.pow(sliderDecay.value(), i), firstNoteTime + i * delay, 0.5)
+      playNote(currentScale.get(furtherNotes(x, y, circuit[i-1][0], circuit[i-1][1])), 0.7 * Math.pow(sliderDecay.value(), i), firstNoteTime + i * delay, 0.5)
     ]);
   }
   scheduledNotes.sort((a, b) => a[0] - b[0]);
